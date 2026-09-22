@@ -1,124 +1,289 @@
--- ============================================
--- ETBC AT - Buddy Systeem Database
--- Importeer dit bestand in phpMyAdmin (tab Import)
--- ============================================
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Gegenereerd op: 22 sep 2026 om 07:27
+-- Serverversie: 9.1.0
+-- PHP-versie: 8.4.1
 
-CREATE DATABASE IF NOT EXISTS etbc_buddy
-CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
-USE etbc_buddy;
 
--- ---------- TABEL: buddies ----------
-CREATE TABLE buddies (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    voornaam VARCHAR(50) NOT NULL,
-    achternaam VARCHAR(50) NOT NULL,
-    woonplaats VARCHAR(100) DEFAULT NULL,
-    bio TEXT,
-    beschikbaarheid VARCHAR(255) DEFAULT NULL,
-    email VARCHAR(100) DEFAULT NULL,
-    telefoon VARCHAR(20) DEFAULT NULL,
-    actief TINYINT(1) DEFAULT 1,
-    aangemaakt_op TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- ---------- TABEL: talen ----------
-CREATE TABLE talen (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    naam VARCHAR(50) NOT NULL
-);
+--
+-- Database: `db_buddy_systeem`
+--
 
--- ---------- TABEL: onderwerpen ----------
-CREATE TABLE onderwerpen (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    naam VARCHAR(100) NOT NULL
-);
+-- --------------------------------------------------------
 
--- ---------- Koppeltabellen (many-to-many) ----------
-CREATE TABLE buddy_talen (
-    buddy_id INT NOT NULL,
-    taal_id INT NOT NULL,
-    PRIMARY KEY (buddy_id, taal_id),
-    FOREIGN KEY (buddy_id) REFERENCES buddies(id) ON DELETE CASCADE,
-    FOREIGN KEY (taal_id) REFERENCES talen(id) ON DELETE CASCADE
-);
+--
+-- Tabelstructuur voor tabel `berichten`
+--
 
-CREATE TABLE buddy_onderwerpen (
-    buddy_id INT NOT NULL,
-    onderwerp_id INT NOT NULL,
-    PRIMARY KEY (buddy_id, onderwerp_id),
-    FOREIGN KEY (buddy_id) REFERENCES buddies(id) ON DELETE CASCADE,
-    FOREIGN KEY (onderwerp_id) REFERENCES onderwerpen(id) ON DELETE CASCADE
-);
+CREATE TABLE `berichten` (
+  `id` int NOT NULL,
+  `buddy_id` int NOT NULL,
+  `naam` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `telefoon` varchar(20) DEFAULT NULL,
+  `bericht` text NOT NULL,
+  `gelezen` tinyint(1) DEFAULT '0',
+  `verstuurd_op` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ---------- TABEL: reviews ----------
-CREATE TABLE reviews (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    buddy_id INT NOT NULL,
-    naam VARCHAR(100) NOT NULL,
-    sterren TINYINT NOT NULL DEFAULT 5,
-    tekst TEXT,
-    datum TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (buddy_id) REFERENCES buddies(id) ON DELETE CASCADE
-);
+-- --------------------------------------------------------
 
--- ---------- TABEL: berichten (contactformulieren) ----------
-CREATE TABLE berichten (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    buddy_id INT NOT NULL,
-    naam VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    telefoon VARCHAR(20) DEFAULT NULL,
-    bericht TEXT NOT NULL,
-    gelezen TINYINT(1) DEFAULT 0,
-    verstuurd_op TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (buddy_id) REFERENCES buddies(id) ON DELETE CASCADE
-);
+--
+-- Tabelstructuur voor tabel `buddies`
+--
 
--- ============================================
--- VOORBEELD DATA (kan je later verwijderen)
--- ============================================
+CREATE TABLE `buddies` (
+  `id` int NOT NULL,
+  `voornaam` varchar(50) NOT NULL,
+  `achternaam` varchar(50) NOT NULL,
+  `woonplaats` varchar(100) DEFAULT NULL,
+  `bio` text,
+  `beschikbaarheid` varchar(255) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `telefoon` varchar(20) DEFAULT NULL,
+  `actief` tinyint(1) DEFAULT '1',
+  `aangemaakt_op` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO talen (naam) VALUES
-('Nederlands'), ('Engels'), ('Arabisch'), ('Turks'), ('Farsi'),
-('Spaans'), ('Frans'), ('Tigrinya'), ('Urdu'), ('Portugees');
+--
+-- Gegevens worden geëxporteerd voor tabel `buddies`
+--
 
-INSERT INTO onderwerpen (naam) VALUES
-('Gemeente & documenten'),
-('Zorg & dokter'),
-('Werk zoeken'),
-('Onderwijs & school'),
-('Belasting & toeslagen'),
-('Huisvesting'),
-('Bank & verzekering');
+INSERT INTO `buddies` (`id`, `voornaam`, `achternaam`, `woonplaats`, `bio`, `beschikbaarheid`, `email`, `telefoon`, `actief`, `aangemaakt_op`) VALUES
+(5, 'kobe', 'amerika', 'afrika\r\n', '', '', '', '', 1, '2026-09-21 12:20:15');
 
-INSERT INTO buddies (voornaam, achternaam, woonplaats, bio, beschikbaarheid, email, telefoon) VALUES
-('Fatima', 'El Amrani', 'Amsterdam', 'Ik help je graag met al je vragen over de gemeente en documenten. Ik weet hoe overweldigend het kan zijn in een nieuw land en leg alles rustig en duidelijk uit.', 'Maandag & woensdag avond', 'fatima@etbcat.nl', '0612345678'),
-('Yusuf', 'Demir', 'Rotterdam', 'Al 5 jaar help ik nieuwkomers met werk zoeken. Samen maken we je CV, oefenen we sollicitaties en zoeken we vacatures.', 'Dinsdag & donderdag middag', 'yusuf@etbcat.nl', '0698765432'),
-('Selam', 'Tesfaye', 'Utrecht', 'Ik help je bij de dokter, het ziekenhuis of het verzekeringspapierwerk. Gezondheid is belangrijk en je moet alles goed begrijpen.', 'Vrijdag & zaterdag ochtend', 'selam@etbcat.nl', '0654321098'),
-('Maria', 'Gonzalez', 'Eindhoven', 'Ik help ouders met schoolzaken van hun kinderen: inschrijving, gesprekken met leerkrachten en correspondentie van school.', 'Woensdag & vrijdag', 'maria@etbcat.nl', '0678901234'),
-('Omar', 'Haddad', 'Den Haag', 'Belastingen en toeslagen zijn ingewikkeld, ook voor Nederlanders! Ik help je met belastingdienst, toeslagen en papieren.', 'Maandag t/m donderdag avond', 'omar@etbcat.nl', '0645678901');
+-- --------------------------------------------------------
 
--- Koppelingen: talen per buddy
-INSERT INTO buddy_talen (buddy_id, taal_id) VALUES
-(1, 1), (1, 3), (1, 2),
-(2, 1), (2, 4), (2, 2),
-(3, 1), (3, 8), (3, 2),
-(4, 1), (4, 6), (4, 2),
-(5, 1), (5, 3), (5, 2);
+--
+-- Tabelstructuur voor tabel `buddy_onderwerpen`
+--
 
--- Koppelingen: onderwerpen per buddy
-INSERT INTO buddy_onderwerpen (buddy_id, onderwerp_id) VALUES
-(1, 1), (1, 6),
-(2, 3),
-(3, 2), (3, 7),
-(4, 4),
-(5, 5), (5, 7);
+CREATE TABLE `buddy_onderwerpen` (
+  `buddy_id` int NOT NULL,
+  `onderwerp_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Voorbeeld reviews
-INSERT INTO reviews (buddy_id, naam, sterren, tekst) VALUES
-(1, 'Ahmed K.', 5, 'Fatima heeft me geholpen met mijn verblijfsvergunning papieren. Ze legt alles heel rustig uit. Echt een aanrader!'),
-(1, 'Sara M.', 5, 'Zeer vriendelijk en geduldig. Dankzij haar snap ik nu de brieven van de gemeente.'),
-(2, 'Mehmet A.', 4, 'Yusuf heeft me geholpen met mijn CV en binnen 2 weken had ik een sollicitatiegesprek.'),
-(3, 'Hanna T.', 5, 'Selam is met me meegegaan naar het ziekenhuis. Wat een steun!'),
-(5, 'Layla H.', 5, 'Omar heeft me geholpen met de toeslagen. Ik snap het nu eindelijk.');
+--
+-- Gegevens worden geëxporteerd voor tabel `buddy_onderwerpen`
+--
+
+INSERT INTO `buddy_onderwerpen` (`buddy_id`, `onderwerp_id`) VALUES
+(5, 5),
+(5, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `buddy_talen`
+--
+
+CREATE TABLE `buddy_talen` (
+  `buddy_id` int NOT NULL,
+  `taal_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `buddy_talen`
+--
+
+INSERT INTO `buddy_talen` (`buddy_id`, `taal_id`) VALUES
+(5, 1),
+(5, 2),
+(5, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `onderwerpen`
+--
+
+CREATE TABLE `onderwerpen` (
+  `id` int NOT NULL,
+  `naam` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `onderwerpen`
+--
+
+INSERT INTO `onderwerpen` (`id`, `naam`) VALUES
+(1, 'Gemeente & documenten'),
+(2, 'Zorg & dokter'),
+(3, 'Werk zoeken'),
+(4, 'Onderwijs & school'),
+(5, 'Belasting & toeslagen'),
+(6, 'Huisvesting'),
+(7, 'Bank & verzekering');
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `id` int NOT NULL,
+  `buddy_id` int NOT NULL,
+  `naam` varchar(100) NOT NULL,
+  `sterren` tinyint NOT NULL DEFAULT '5',
+  `tekst` text,
+  `datum` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `talen`
+--
+
+CREATE TABLE `talen` (
+  `id` int NOT NULL,
+  `naam` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `talen`
+--
+
+INSERT INTO `talen` (`id`, `naam`) VALUES
+(1, 'Nederlands'),
+(2, 'Engels'),
+(3, 'Arabisch'),
+(4, 'Turks'),
+(5, 'Farsi'),
+(6, 'Spaans'),
+(7, 'Frans'),
+(8, 'Tigrinya'),
+(9, 'Urdu'),
+(10, 'Portugees');
+
+--
+-- Indexen voor geëxporteerde tabellen
+--
+
+--
+-- Indexen voor tabel `berichten`
+--
+ALTER TABLE `berichten`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `buddy_id` (`buddy_id`);
+
+--
+-- Indexen voor tabel `buddies`
+--
+ALTER TABLE `buddies`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexen voor tabel `buddy_onderwerpen`
+--
+ALTER TABLE `buddy_onderwerpen`
+  ADD PRIMARY KEY (`buddy_id`,`onderwerp_id`),
+  ADD KEY `onderwerp_id` (`onderwerp_id`);
+
+--
+-- Indexen voor tabel `buddy_talen`
+--
+ALTER TABLE `buddy_talen`
+  ADD PRIMARY KEY (`buddy_id`,`taal_id`),
+  ADD KEY `taal_id` (`taal_id`);
+
+--
+-- Indexen voor tabel `onderwerpen`
+--
+ALTER TABLE `onderwerpen`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexen voor tabel `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `buddy_id` (`buddy_id`);
+
+--
+-- Indexen voor tabel `talen`
+--
+ALTER TABLE `talen`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT voor geëxporteerde tabellen
+--
+
+--
+-- AUTO_INCREMENT voor een tabel `berichten`
+--
+ALTER TABLE `berichten`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT voor een tabel `buddies`
+--
+ALTER TABLE `buddies`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT voor een tabel `onderwerpen`
+--
+ALTER TABLE `onderwerpen`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT voor een tabel `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT voor een tabel `talen`
+--
+ALTER TABLE `talen`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- Beperkingen voor geëxporteerde tabellen
+--
+
+--
+-- Beperkingen voor tabel `berichten`
+--
+ALTER TABLE `berichten`
+  ADD CONSTRAINT `berichten_ibfk_1` FOREIGN KEY (`buddy_id`) REFERENCES `buddies` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `buddy_onderwerpen`
+--
+ALTER TABLE `buddy_onderwerpen`
+  ADD CONSTRAINT `buddy_onderwerpen_ibfk_1` FOREIGN KEY (`buddy_id`) REFERENCES `buddies` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `buddy_onderwerpen_ibfk_2` FOREIGN KEY (`onderwerp_id`) REFERENCES `onderwerpen` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `buddy_talen`
+--
+ALTER TABLE `buddy_talen`
+  ADD CONSTRAINT `buddy_talen_ibfk_1` FOREIGN KEY (`buddy_id`) REFERENCES `buddies` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `buddy_talen_ibfk_2` FOREIGN KEY (`taal_id`) REFERENCES `talen` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`buddy_id`) REFERENCES `buddies` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
